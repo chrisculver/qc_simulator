@@ -1,5 +1,5 @@
 use crate::gate;
-use gate::Gate;
+use gate::Gate as Gate;
 
 pub struct Circuit {
     pub qubits: usize,
@@ -53,6 +53,8 @@ impl Circuit {
 #[cfg(test)]
 mod tests {
     use super::Circuit;
+    use crate::gate;
+    use gate::Gate;
 
     #[test]
     fn empty_circuit() {
