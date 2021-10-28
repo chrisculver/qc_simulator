@@ -13,7 +13,7 @@ pub struct Gate {
 
 
 impl Gate {
-    pub fn get_matrix(self, nq: usize) -> DMatrix<Complex> 
+    pub fn get_matrix(&self, nq: usize) -> DMatrix<Complex> 
     where
     {
         let zero = Complex::new(0.,0.);
@@ -22,6 +22,8 @@ impl Gate {
         
         let two:usize = 2;
         let size:usize = two.pow(nq as u32);
+
+        //println!("expected size = {}",size);
 
         if self.name != String::from("CX") {
             let mut start = SMatrix::<Complex,2,2>::new(zero,zero,zero,zero);
@@ -32,24 +34,37 @@ impl Gate {
                 start = id;
             }
             
-            let matrix = start;
+            let mut matrix = DMatrix::from_element(2,2,Complex::new(0.,0.));
 
             for i in 1..nq {
+                //println!("i={}",i);
+                let tmp = start;
+                
+                let s = start.shape().0*2;
+                let mut new = DMatrix::<Complex>::from_element(s,s,Complex::new(0.0,0.0));
+
                 if self.target==i {
                     let gate = self.get_single_qubit_gate();
-                    let matrix = matrix.kronecker(&gate);
+                    let t = tmp.kronecker(&gate);
+                    new = DMatrix::<Complex>::from_fn(s,s,|r,c| t[(r,c)]);
                 }
                 else {
-                    let matrix = matrix.kronecker(&id);
+                    let t = tmp.kronecker(&id);
+                    new = DMatrix::<Complex>::from_fn(s,s,|r,c| t[(r,c)]);
                 }
+
+                matrix = new;
             }
-            
+           
+            //println!("size of matrix = {},{}", matrix.shape().0, matrix.shape().1);
+            //println!("matrix={}",matrix);
+
             return DMatrix::<Complex>::from_fn(size, size, |r,c| matrix[(r,c)])
 
         } else if self.name == String::from("CX") {
             return DMatrix::<Complex>::from_fn(size, size, |r,c| self.cnot_elem(r,c));
         } else {
-            return DMatrix::<Complex>::from_fn(size,size, |r,c| Complex::new(0.,0.)); 
+            return DMatrix::<Complex>::from_fn(size, size, |_r,_c| Complex::new(0.,0.)); 
         }
     }
     
@@ -91,5 +106,38 @@ impl Gate {
 
 #[cfg(test)]
 mod tests {
+    extern crate nalgebra as na;
     use super::Gate;
+    type Complex = na::Complex<f64>;
+    use na::base::SMatrix as SMatrix;
+
+    #[test]
+    fn test_kron_qubit_gates() {
+        type Mat4x4 = SMatrix::<Complex,4,4>;
+        let zero = Complex::new(0.,0.);
+        let one = Complex::new(1.,0.);
+        let id_tens_x = Mat4x4::new(zero,one,zero,zero,
+                                    one,zero,zero,zero,
+                                    zero,zero,zero,one,
+                                    zero,zero,one,zero);
+    
+        let x_tens_id = Mat4x4::new(zero,zero,one,zero,
+                                    zero,zero,zero,one,
+                                    one,zero,zero,zero,
+                                    zero,one,zero,zero);
+
+        let xgate0 = Gate { 
+            name: String::from("X"),            
+            target: 0,
+            control: None,
+        };
+        let xgate1 = Gate { 
+            name: String::from("X"),            
+            target: 1,
+            control: None,
+        };
+
+        assert_eq!(xgate1.get_matrix(2),id_tens_x);
+        assert_eq!(xgate0.get_matrix(2),x_tens_id);
+    }
 }
