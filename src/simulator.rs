@@ -22,6 +22,10 @@ impl State {
             }
         }
     }
+
+    //fn print(&self) -> String {
+        
+    //}
 }
 
 
@@ -32,14 +36,19 @@ pub struct Simulator {
 
 
 impl Simulator {
+    fn new(c: circuit::Circuit) -> Simulator {
+        let nq = c.qubits;
+        Simulator { circ: c, state: State::new(Some(nq)) } 
+    }
+
     fn run(mut self) {
-//        for g in self.circ.gates {
-//            self.state.coefs = g.get_matrix(self.circ.qubits)*self.state.coefs;
-//        }
+        for g in self.circ.gates {
+            self.state.coefs = g.get_matrix(self.circ.qubits)*self.state.coefs;
+        }
     }
 }
 
-
+// tests for state
 #[cfg(test)]
 mod tests {
     use super::State;
@@ -60,4 +69,10 @@ mod tests {
         expected[0]=Complex::new(1.,0.);
         assert_eq!(s.coefs,expected);
     }
+}
+
+// tests for simulator
+#[cfg(tst)]
+mod tests {
+    use super::Simulator;
 }
