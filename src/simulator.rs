@@ -23,10 +23,17 @@ impl State {
         }
     }
 
-    //fn print(&self) -> String {
-        
-    //}
+    // TODO: Probably just move this into display
+
+    fn print(&self) -> String {
+        let mut s: String = "".to_owned();
+        for (i,coef) in self.coefs.iter().enumerate() {
+            s.push_str(&format!("{}: {:b}",coef,i));
+        }
+        s
+    }
 }
+
 
 
 pub struct Simulator {
@@ -71,8 +78,7 @@ mod tests {
     }
 }
 
-// tests for simulator
-#[cfg(tst)]
+#[cfg(test)]
 mod tests {
-    use super::Simulator;
+
 }
