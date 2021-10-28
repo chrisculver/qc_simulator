@@ -27,8 +27,15 @@ impl State {
 
     fn print(&self) -> String {
         let mut s: String = "".to_owned();
+
+        let width=(self.coefs.len() as f64).log2() as usize;
+
         for (i,coef) in self.coefs.iter().enumerate() {
-            s.push_str(&format!("{}: {:b}",coef,i));
+            if(i==(self.coefs.len()-1)) {
+                s.push_str(&format!("{}: {:0width$b}",coef,i,width=width));
+            } else {
+                s.push_str(&format!("{}: {:0width$b}, ",coef,i,width=width));
+            }
         }
         s
     }
@@ -76,9 +83,18 @@ mod tests {
         expected[0]=Complex::new(1.,0.);
         assert_eq!(s.coefs,expected);
     }
+
+    #[test]
+    fn test_print() {
+        let mut s = State::new(Some(3));
+        s.coefs[0]=Complex::new(1.,0.);
+        s.coefs[2]=Complex::new(-1.,-3.14);
+        s.coefs[5]=Complex::new(0.5,0.5);
+        s.coefs[7]=Complex::new(0.,1.);
+
+        let expected = "1+0i: 000, 0+0i: 001, -1-3.14i: 010, 0+0i: 011, 0+0i: 100, 0.5+0.5i: 101, 0+0i: 110, 0+1i: 111";
+
+        assert_eq!(s.print(), expected);
+    }
 }
 
-#[cfg(test)]
-mod tests {
-
-}
