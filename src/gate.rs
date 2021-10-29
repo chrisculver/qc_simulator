@@ -45,15 +45,15 @@ impl Gate {
                 start = id;
             }
             
-            let mut matrix = DMatrix::from_element(2,2,Complex::new(0.,0.));
+            let mut matrix = DMatrix::from_fn(2,2,|r,c| start[(r,c)]);
 
             for i in 1..nq {
                 //println!("i={}",i);
-                let tmp = start;
+                let tmp = matrix;
                 
-                let s = start.shape().0*2;
+                let s = tmp.shape().0*2;
                 let mut new = DMatrix::<Complex>::from_element(s,s,Complex::new(0.0,0.0));
-
+                
                 if self.target==i {
                     let gate = self.get_single_qubit_gate();
                     let t = tmp.kronecker(&gate);
@@ -65,10 +65,10 @@ impl Gate {
                 }
 
                 matrix = new;
+                //println!("matrix={}",matrix);
             }
            
             //println!("size of matrix = {},{}", matrix.shape().0, matrix.shape().1);
-            //println!("matrix={}",matrix);
 
             return DMatrix::<Complex>::from_fn(size, size, |r,c| matrix[(r,c)])
 

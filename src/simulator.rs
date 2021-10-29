@@ -55,12 +55,8 @@ impl Simulator {
         Simulator { circ: c, state: State::new(Some(nq)) } 
     }
 
-    fn run(mut self) {
-        println!("Running");
-        println!("There are {} gates.",self.circ.gates.len());
+    fn run(&mut self) {
         for g in self.circ.gates {
-            println!("Gate is {}",g);
-            println!("{}",g.get_matrix(self.circ.qubits));
             self.state.coefs = g.get_matrix(self.circ.qubits)*self.state.coefs;
         }
     }
@@ -108,9 +104,10 @@ mod tests {
         let mut c = circuit::Circuit::new(3);
         c.x(0);
         c.x(2);
-        println!("Circuit made, now simulating...");
         let mut s = Simulator::new(c);
         s.run();
+        
+        assert_eq!(s.state.print(), "test".to_string());
     }
 }
 
