@@ -3,6 +3,7 @@ type Complex = na::Complex<f64>;
 use na::base::SMatrix as SMatrix;
 use na::Matrix2;
 use na::DMatrix;
+use std::fmt;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Gate {
@@ -11,6 +12,16 @@ pub struct Gate {
     pub control: Option<usize>,
 }
 
+impl fmt::Display for Gate {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> fmt::Result {
+        if self.control.is_none() {
+            write!(f, "{}({})", self.name, self.target)
+        }
+        else {
+            write!(f, "{}({},{})", self.name, self.target, self.control.unwrap())
+        }
+    }
+}
 
 impl Gate {
     pub fn get_matrix(&self, nq: usize) -> DMatrix<Complex> 
@@ -69,7 +80,7 @@ impl Gate {
     }
     
     fn cnot_elem(&self, i: usize, j: usize) -> Complex {
-        Complex::new(0.,0.)
+        Complex::new(i as f64, j as f64)
     }
 
     fn get_single_qubit_gate(&self) -> Matrix2<Complex> {

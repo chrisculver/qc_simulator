@@ -31,7 +31,7 @@ impl State {
         let width=(self.coefs.len() as f64).log2() as usize;
 
         for (i,coef) in self.coefs.iter().enumerate() {
-            if(i==(self.coefs.len()-1)) {
+            if i==(self.coefs.len()-1) {
                 s.push_str(&format!("{}: {:0width$b}",coef,i,width=width));
             } else {
                 s.push_str(&format!("{}: {:0width$b}, ",coef,i,width=width));
@@ -56,7 +56,11 @@ impl Simulator {
     }
 
     fn run(mut self) {
+        println!("Running");
+        println!("There are {} gates.",self.circ.gates.len());
         for g in self.circ.gates {
+            println!("Gate is {}",g);
+            println!("{}",g.get_matrix(self.circ.qubits));
             self.state.coefs = g.get_matrix(self.circ.qubits)*self.state.coefs;
         }
     }
@@ -66,6 +70,8 @@ impl Simulator {
 #[cfg(test)]
 mod tests {
     use super::State;
+    use super::Simulator;
+    use crate::circuit;
     extern crate nalgebra as na;
     type Complex = na::Complex<f64>;
     use na::base::DVector as DVector;
@@ -95,6 +101,16 @@ mod tests {
         let expected = "1+0i: 000, 0+0i: 001, -1-3.14i: 010, 0+0i: 011, 0+0i: 100, 0.5+0.5i: 101, 0+0i: 110, 0+1i: 111";
 
         assert_eq!(s.print(), expected);
+    }
+
+    #[test]
+    fn test_simple_circuits() {
+        let mut c = circuit::Circuit::new(3);
+        c.x(0);
+        c.x(2);
+        println!("Circuit made, now simulating...");
+        let mut s = Simulator::new(c);
+        s.run();
     }
 }
 

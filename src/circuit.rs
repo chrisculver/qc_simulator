@@ -7,6 +7,10 @@ pub struct Circuit {
 }
 
 impl Circuit {
+    pub fn new(q: usize) -> Circuit {
+        Circuit { qubits: q, gates: Vec::<Gate>::new()}
+    } 
+
     pub fn x(&mut self, q: usize ) {
         self.gates.push(Gate { 
             name: String::from("X"),
