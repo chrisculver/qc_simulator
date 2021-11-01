@@ -37,24 +37,27 @@ impl Gate {
         //println!("expected size = {}",size);
 
         if self.name != String::from("CX") {
-            let mut start = SMatrix::<Complex,2,2>::new(zero,zero,zero,zero);
-            if self.target == 0 {
+            let start;
+            if self.target == nq-1 {
                 start = self.get_single_qubit_gate();
             }
             else {
                 start = id;
             }
-            
             let mut matrix = DMatrix::from_fn(2,2,|r,c| start[(r,c)]);
 
-            for i in 1..nq {
+            //println!("start={}",matrix); 
+            
+            let mut i=(nq-2) as isize;
+            while i>(-1) {
                 //println!("i={}",i);
+
                 let tmp = matrix;
                 
                 let s = tmp.shape().0*2;
-                let mut new = DMatrix::<Complex>::from_element(s,s,Complex::new(0.0,0.0));
-                
-                if self.target==i {
+                let new;
+                //println!("s={}",s); 
+                if self.target as isize==i {
                     let gate = self.get_single_qubit_gate();
                     let t = tmp.kronecker(&gate);
                     new = DMatrix::<Complex>::from_fn(s,s,|r,c| t[(r,c)]);
@@ -66,6 +69,7 @@ impl Gate {
 
                 matrix = new;
                 //println!("matrix={}",matrix);
+                i=i-1;
             }
            
             //println!("size of matrix = {},{}", matrix.shape().0, matrix.shape().1);
@@ -84,18 +88,43 @@ impl Gate {
         let mut res = Complex::new(0.0,0.0);
         let ibin = format!("{:0width$b}",i,width=nq);
         let jbin = format!("{:0width$b}",j,width=nq);
+//        println!("i={},j={},c={},t={}",i,j,self.control.unwrap(),self.target);
+//        println!(" ibin={}, jbin={}", ibin, jbin);
 
-        let ti = ibin.chars().nth(self.target).unwrap().to_digit(10).unwrap();
-        let tj = jbin.chars().nth(self.target).unwrap().to_digit(10).unwrap();
-        let ci = ibin.chars().nth(self.control.unwrap()).unwrap().to_digit(10).unwrap();
-        let cj = jbin.chars().nth(self.control.unwrap()).unwrap().to_digit(10).unwrap();
+        let mut iother = ibin.to_string();
+        let mut jother = jbin.to_string();
+
+        if nq>2 && self.target>self.control.unwrap() {
+            iother.remove(nq-self.target-1);
+            jother.remove(nq-self.target-1);
+            iother.remove(nq-self.control.unwrap()-2); // because this string has one less char already
+            jother.remove(nq-self.control.unwrap()-2);
+        } else if nq>2 && self.target<self.control.unwrap() {
+            iother.remove(nq-self.control.unwrap()-1); 
+            jother.remove(nq-self.control.unwrap()-1); 
+            iother.remove(nq-self.target-2);
+            jother.remove(nq-self.target-2);
+        } else {
+            iother = "".to_string();
+            jother = "".to_string();
+        }
+
+//        println!("  iother={}, jother={}", iother, jother);
+
+        let ti = ibin.chars().nth(nq-self.target-1).unwrap().to_digit(10).unwrap();
+        let tj = jbin.chars().nth(nq-self.target-1).unwrap().to_digit(10).unwrap();
+        let ci = ibin.chars().nth(nq-self.control.unwrap()-1).unwrap().to_digit(10).unwrap();
+        let cj = jbin.chars().nth(nq-self.control.unwrap()-1).unwrap().to_digit(10).unwrap();
 
         if ci==0 && cj==0 && i==j {
             res = Complex::new(1.0,0.0);
-        } else if ci==1 && cj==1 && ti!=tj {
-            res = Complex::new(1.0,0.0);
+        } else if ci==1 && cj==1 {
+            if ti!=tj && iother==jother {
+                res = Complex::new(1.0,0.0);
+            }
         }
         
+ //       println!("  res={}", res);
         res
     }
 
@@ -164,7 +193,7 @@ mod tests {
             control: None,
         };
 
-        assert_eq!(xgate1.get_matrix(2),id_tens_x);
-        assert_eq!(xgate0.get_matrix(2),x_tens_id);
+        assert_eq!(xgate1.get_matrix(2),x_tens_id);
+        assert_eq!(xgate0.get_matrix(2),id_tens_x);
     }
 }
