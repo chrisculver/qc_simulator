@@ -73,14 +73,30 @@ impl Gate {
             return DMatrix::<Complex>::from_fn(size, size, |r,c| matrix[(r,c)])
 
         } else if self.name == String::from("CX") {
-            return DMatrix::<Complex>::from_fn(size, size, |r,c| self.cnot_elem(r,c));
+            return DMatrix::<Complex>::from_fn(size, size, |r,c| self.cnot_elem(r,c,nq));
         } else {
             return DMatrix::<Complex>::from_fn(size, size, |_r,_c| Complex::new(0.,0.)); 
         }
     }
     
-    fn cnot_elem(&self, i: usize, j: usize) -> Complex {
-        Complex::new(i as f64, j as f64)
+    fn cnot_elem(&self, i: usize, j: usize, nq: usize) -> Complex {
+        //TODO: with masks and shifts will be quicker then converting to string.
+        let mut res = Complex::new(0.0,0.0);
+        let ibin = format!("{:0width$b}",i,width=nq);
+        let jbin = format!("{:0width$b}",j,width=nq);
+
+        let ti = ibin.chars().nth(self.target).unwrap().to_digit(10).unwrap();
+        let tj = jbin.chars().nth(self.target).unwrap().to_digit(10).unwrap();
+        let ci = ibin.chars().nth(self.control.unwrap()).unwrap().to_digit(10).unwrap();
+        let cj = jbin.chars().nth(self.control.unwrap()).unwrap().to_digit(10).unwrap();
+
+        if ci==0 && cj==0 && i==j {
+            res = Complex::new(1.0,0.0);
+        } else if ci==1 && cj==1 && ti!=tj {
+            res = Complex::new(1.0,0.0);
+        }
+        
+        res
     }
 
     fn get_single_qubit_gate(&self) -> Matrix2<Complex> {

@@ -101,7 +101,7 @@ mod tests {
     }
 
     #[test]
-    fn test_simple_circuits() {
+    fn test_2x_circuit() {
         let mut c = circuit::Circuit::new(3);
         c.x(0);
         c.x(2);
@@ -111,5 +111,21 @@ mod tests {
         let expected = "0+0i: 000, 0+0i: 001, 0+0i: 010, 0+0i: 011, 0+0i: 100, 1+0i: 101, 0+0i: 110, 0+0i: 111";
         assert_eq!(s.state.print(), expected);
     }
+
+    #[test]
+    fn test_cnot_circuit() {
+        let mut c = circuit::Circuit::new(2);
+        c.x(0);
+        c.cx(0,1);
+        let mut s = Simulator::new(c);
+        s.run();
+        
+        println!("{}",s.circ.gates[1].get_matrix(s.circ.qubits));
+
+        let expected = "0+0i: 00, 0+0i: 01, 0+0i: 10, 1+0i: 11";
+        assert_eq!(s.state.print(), expected);
+    }
+
+
 }
 
