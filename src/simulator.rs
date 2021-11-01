@@ -56,8 +56,9 @@ impl Simulator {
     }
 
     fn run(&mut self) {
-        for g in self.circ.gates {
-            self.state.coefs = g.get_matrix(self.circ.qubits)*self.state.coefs;
+        for g in self.circ.gates.iter_mut() {
+            let vec = self.state.coefs.clone();
+            self.state.coefs = g.get_matrix(self.circ.qubits)*vec;
         }
     }
 }
@@ -107,7 +108,8 @@ mod tests {
         let mut s = Simulator::new(c);
         s.run();
         
-        assert_eq!(s.state.print(), "test".to_string());
+        let expected = "0+0i: 000, 0+0i: 001, 0+0i: 010, 0+0i: 011, 0+0i: 100, 1+0i: 101, 0+0i: 110, 0+0i: 111";
+        assert_eq!(s.state.print(), expected);
     }
 }
 
