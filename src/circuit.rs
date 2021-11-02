@@ -1,12 +1,40 @@
 use crate::gate;
 use gate::Gate as Gate;
 
+///Hold the information of a quantum circuit, can be passed into simulator
+///to get the output from an perfect quantum computer.
+///
+///The [`Circuit::new`] method lets you create a circuit of q qubits and no gates.
+///To add gates to the circuit you can call any of the implemented gates, currently
+///there is support for x,y,z,h, and cx.  Each of these are implemented as methods
+///with arguments corresponding to the qubits you want the gates to act on. 
+///
+///The cx gate operates on two qubits, taking the control first and target second.
+///
+///Examples:
+///
+///```
+///let c = Circuit::new(4);
+///c.x(0);
+///c.x(3);
+///c.cx(3,1);
+///c.h(1);
+///c.z(2);
+///c.cx(1,2);
+///```
 pub struct Circuit {
     pub qubits: usize,
     pub gates: Vec<Gate>,
 }
 
 impl Circuit {
+    ///Creates a new circuit with q qubits and no gates
+    ///
+    ///# Example for a 3 qubit circuit
+    ///
+    ///```
+    ///let c = Circuit::new(3);
+    ///```
     pub fn new(q: usize) -> Circuit {
         Circuit { qubits: q, gates: Vec::<Gate>::new()}
     } 
