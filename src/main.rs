@@ -6,9 +6,9 @@ extern crate nalgebra as na;
 
 
 fn main() {
-    println!("Hello, world!");
-
-    let mut c = circuit::Circuit::new(4);
+    // make a 4 qubit circuit
+    let mut c = circuit::Circuit::new(4); 
+    // construct the circuit
     c.x(1);
     c.h(2);
     c.h(3);
@@ -24,10 +24,11 @@ fn main() {
     c.x(3);
     c.y(1);
 
-    println!("gate[4]={}",c.gates[4].get_matrix(4));
+    println!("gate[4]={}",c.gates[4]);
+    println!("gate[4] matrix={}",c.gates[4].get_matrix(4));
 
+    //simulate the circuit
     let mut s = simulator::Simulator::new(c);
-
     s.run();
 
     println!("final state = {}",s.state.print());

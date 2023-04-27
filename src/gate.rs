@@ -18,7 +18,7 @@ impl fmt::Display for Gate {
             write!(f, "{}({})", self.name, self.target)
         }
         else {
-            write!(f, "{}({},{})", self.name, self.target, self.control.unwrap())
+            write!(f, "{}({},{})", self.name, self.control.unwrap(), self.target)
         }
     }
 }
