@@ -6,6 +6,7 @@ use na::base::DVector as DVector;
 pub struct State
 {
     /// note you can probably figure out the size at compile time
+    /// at least as long as the whole circuit is constructed in main
     coefs: DVector<Complex>,
 }
 
@@ -48,7 +49,11 @@ pub struct Simulator {
     pub state: State,
 }
 
-
+///Simulates a quantum circuit
+///
+///The [`Simulator::new`] method lets you simulate a circuit, once 
+///the simulator is constructed just call the [`Simulator::run`] method.
+///
 impl Simulator {
     pub fn new(c: circuit::Circuit) -> Simulator {
         let nq = c.qubits;

@@ -24,6 +24,7 @@ fn main() {
     c.x(3);
     c.y(1);
 
+    //We can print the gate in a human readable form, or as its matrix on the whole circuit
     println!("gate[4]={}",c.gates[4]);
     println!("gate[4] matrix={}",c.gates[4].get_matrix(4));
 
@@ -31,5 +32,6 @@ fn main() {
     let mut s = simulator::Simulator::new(c);
     s.run();
 
+    //print the result
     println!("final state = {}",s.state.print());
 }
